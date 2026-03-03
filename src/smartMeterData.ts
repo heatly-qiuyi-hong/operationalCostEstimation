@@ -55,5 +55,5 @@ async function smartMeterData(
   return res;
 }
 // const energyData = await smartMeterData();
-// console.log(energyData);
+// console.log(energyData.data.map((d: any) => d[1]));
 export default smartMeterData;

@@ -26,11 +26,11 @@ async function hourlyWeatherData(
   const elevation = response.elevation();
   const utcOffsetSeconds = response.utcOffsetSeconds();
 
-//   console.log(
-//     `\nCoordinates: ${latitude}°N ${longitude}°E`,
-//     `\nElevation: ${elevation}m asl`,
-//     `\nTimezone difference to GMT+0: ${utcOffsetSeconds}s`,
-//   );
+  //   console.log(
+  //     `\nCoordinates: ${latitude}°N ${longitude}°E`,
+  //     `\nElevation: ${elevation}m asl`,
+  //     `\nTimezone difference to GMT+0: ${utcOffsetSeconds}s`,
+  //   );
 
   const hourly = response.hourly()!;
 
@@ -56,5 +56,10 @@ async function hourlyWeatherData(
 }
 // The 'weatherData' object now contains a simple structure, with arrays of datetimes and weather information
 // const weatherData = await hourlyWeatherData();
+// const weatherDataHourly = weatherData.hourly.temperature_2m?.slice(
+//   0,
+//   weatherData.hourly.temperature_2m.length - 23,
+// );
+// console.log(Array.from(weatherDataHourly!));
 // console.log("\nHourly data:\n", weatherData.hourly.temperature_2m);
 export default hourlyWeatherData;

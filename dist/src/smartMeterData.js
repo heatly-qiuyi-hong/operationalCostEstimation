@@ -43,5 +43,5 @@ async function smartMeterData(startTime = "2025-11-18T00:00:00", endTime = "2025
     return res;
 }
 // const energyData = await smartMeterData();
-// console.log(energyData);
+// console.log(energyData.data.map((d: any) => d[1]));
 export default smartMeterData;

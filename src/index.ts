@@ -9,6 +9,7 @@ import Household from "../models/households.js";
 
 import smartMeterData from "./smartMeterData.js";
 import hourlyWeatherData from "./weather.js";
+import heatPumpCost from "./heatPump.js";
 import { start } from "repl";
 
 mongoose
@@ -100,33 +101,11 @@ app.get("/households/:id/cost", async (req, res) => {
       endTime,
       gasCost: "",
       electricityCost: "",
+      elecConsumption: [],
     });
   }
 
   try {
-    const starTimeSmartMeter = `${startTime}:00`;
-    const endTimeSmartMeter = `${endTime}:00`;
-    const energyData = await smartMeterData(
-      starTimeSmartMeter,
-      endTimeSmartMeter,
-    );
-    let gasCost = 0;
-    let electricityCost = 0;
-    if (energyData.data.length > 0) {
-      for (let dailyData of energyData.data) {
-        if (energyData.classifier === "gas.consumption") {
-          gasCost +=
-            dailyData[1] * gasTariff.unitRate + gasTariff.standingCharge;
-        } else if (energyData.classifier === "electricity.consumption") {
-          electricityCost +=
-            dailyData[1] * electricityTariff.unitRate +
-            electricityTariff.standingCharge;
-        }
-      }
-    } else {
-      console.warn("No energy data retrieved for the specified time range.");
-    }
-
     const startTimeWeather = startTime.split("T")[0];
     const endTimeWeather = endTime.split("T")[0];
     const weatherData = await hourlyWeatherData(
@@ -141,6 +120,41 @@ app.get("/households/:id/cost", async (req, res) => {
       weatherData.hourly.temperature_2m.length - 23,
     );
 
+    const starTimeSmartMeter = `${startTime}:00`;
+    const endTimeSmartMeter = `${endTime}:00`;
+    const energyData = await smartMeterData(
+      starTimeSmartMeter,
+      endTimeSmartMeter,
+    );
+    let gasCost = 0;
+    let electricityCost = 0;
+    let elecConsumption: number[] = [];
+    if (energyData.data.length > 0) {
+      for (let dailyData of energyData.data) {
+        if (energyData.classifier === "gas.consumption") {
+          gasCost +=
+            dailyData[1] * gasTariff.unitRate + gasTariff.standingCharge;
+        } else if (energyData.classifier === "electricity.consumption") {
+          electricityCost +=
+            dailyData[1] * electricityTariff.unitRate +
+            electricityTariff.standingCharge;
+        }
+      }
+
+      elecConsumption = await heatPumpCost(
+        energyData.data.map((d: any) => d[1]),
+        Array.from(weatherDataHourly!),
+        749,
+      );
+      for (let i = 0; i < elecConsumption.length; i++) {
+        electricityCost +=
+          elecConsumption[i] * electricityTariff.unitRate +
+          electricityTariff.standingCharge;
+      }
+    } else {
+      console.warn("No energy data retrieved for the specified time range.");
+    }
+
     return res.render("../views/households/cost.ejs", {
       household,
       energyData,
@@ -150,6 +164,7 @@ app.get("/households/:id/cost", async (req, res) => {
       endTime,
       gasCost: gasCost.toFixed(2),
       electricityCost: electricityCost.toFixed(2),
+      elecConsumption,
     });
   } catch (e) {
     console.error(e);

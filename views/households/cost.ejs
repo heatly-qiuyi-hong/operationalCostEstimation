@@ -40,6 +40,9 @@
     <h2>Weather Data (<%= weatherDataHourly.length %> records)</h2>
     <pre><%= JSON.stringify(weatherDataHourly, null, 2) %></pre>
 
+    <h2>Electricity Consumption (<%= elecConsumption.length %> records)</h2>
+    <pre><%= JSON.stringify(elecConsumption, null, 2) %></pre>
+
     <a href="/households/<%= household._id %>">Cancel</a>
   </body>
 </html>

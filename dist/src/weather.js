@@ -38,5 +38,10 @@ async function hourlyWeatherData(startTime = "2025-11-18", endTime = "2025-11-19
 }
 // The 'weatherData' object now contains a simple structure, with arrays of datetimes and weather information
 // const weatherData = await hourlyWeatherData();
+// const weatherDataHourly = weatherData.hourly.temperature_2m?.slice(
+//   0,
+//   weatherData.hourly.temperature_2m.length - 23,
+// );
+// console.log(Array.from(weatherDataHourly!));
 // console.log("\nHourly data:\n", weatherData.hourly.temperature_2m);
 export default hourlyWeatherData;
