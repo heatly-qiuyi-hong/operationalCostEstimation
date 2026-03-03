@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= household.name %></title>
+</head>
+<body>
+    <h1><%= household.name %></h1>
+    <ul>
+        <li>Address: <%= household.address %></li>
+        <li>Latitude: <%= household.latitude %></li>
+        <li>Longitude: <%= household.longitude %></li>
+        <li>Heating Resource: <%= household.heatingResource %></li>
+    </ul>
+
+    <a href="/households">Back to all households</a>
+    <a href="/households/<%= household._id %>/edit">Edit Household</a>
+    <a href="/households/<%= household._id %>/cost">Operational Cost</a>
+    <!-- <form action="/households/<%=household._id%>?_method=DELETE" method="POST">
+        <button type="submit">Delete Household</button>
+    </form> -->
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Household Cost</title>
+  </head>
+  <body>
+    <h1>Operational Cost for <%= household.name %>'s Property</h1>
+
+    <form method="GET" action="/households/<%= household._id %>/cost">
+      <label for="startTime">Start Time</label>
+      <input
+        type="datetime-local"
+        id="startTime"
+        name="startTime"
+        value="<%= startTime %>"
+        required
+      />
+
+      <label for="endTime">End Time</label>
+      <input
+        type="datetime-local"
+        id="endTime"
+        name="endTime"
+        value="<%= endTime %>"
+        required
+      />
+
+      <button type="submit">Get Data</button>
+    </form>
+    <h2>Operational Costs</h2>
+    <p>Gas Cost (£): <%= gasCost %></p>
+    <p>Electricity Cost (£): <%= electricityCost %></p>
+
+    <h2>Smart Meter Data (<%= energyData.data.length %> records)</h2>
+
+    <pre><%= JSON.stringify(energyData.data, null, 2) %></pre>
+
+    <h2>Weather Data (<%= weatherDataHourly.length %> records)</h2>
+    <pre><%= JSON.stringify(weatherDataHourly, null, 2) %></pre>
+
+    <a href="/households/<%= household._id %>">Cancel</a>
+  </body>
+</html>

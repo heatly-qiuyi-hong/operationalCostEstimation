@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Households</title>
+</head>
+<body>
+    <h1>All Households!</h1>
+    <ul>
+        <% for(let household of households) { %>
+            <li><a href="/households/<%= household._id %>"><%= household.name %></a></li>
+        <% } %>
+    </ul>
+    <!-- <a href="/households/new">Add a new household</a> -->
+</body>
+</html>

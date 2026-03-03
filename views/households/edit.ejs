@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Household</title>
+</head>
+<body>
+    <h1>Edit Household</h1>
+    <form action="/households/<%= household._id %>?_method=PUT" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" placeholder="household name" value="<%= household.name %>">
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" placeholder="household address" value="<%= household.address %>">
+        <label for="latitude">Latitude:</label>
+        <input type="text" id="latitude" name="latitude" placeholder="household latitude" value="<%= household.latitude %>">
+        <label for="longitude">Longitude:</label>
+        <input type="text" id="longitude" name="longitude" placeholder="household longitude" value="<%= household.longitude %>">
+        <label for="heatingResource">Heating Resource:</label>
+        <input type="text" id="heatingResource" name="heatingResource" placeholder="household heating resource" value="<%= household.heatingResource %>">
+        <button type="submit">Update Household</button>
+    </form>
+    <a href="/households/<%= household._id %>">Cancel</a>
+</body>
+</html>
