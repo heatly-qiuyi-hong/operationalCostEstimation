@@ -10,6 +10,7 @@ import Household from "../models/households.js";
 import smartMeterData from "./smartMeterData.js";
 import hourlyWeatherData from "./weather.js";
 import heatPumpCost from "./heatPump.js";
+import getManufacturers from "./manufacturers.js";
 import { start } from "repl";
 
 mongoose
@@ -42,6 +43,8 @@ const electricityTariff = {
   standingCharge: 0.527,
   unitRate: 0.234,
 };
+
+const manufacturers = await getManufacturers();
 
 app.get("/households", async (req, res) => {
   const households = await Household.find({});
@@ -83,9 +86,10 @@ app.put("/households/:id", async (req, res) => {
 
 app.get("/households/:id/cost", async (req, res) => {
   const { id } = req.params;
-  const { startTime, endTime } = req.query as {
+  const { startTime, endTime, manufacturerId } = req.query as {
     startTime?: string;
     endTime?: string;
+    manufacturerId?: string;
   };
 
   const household = await Household.findById(id);
@@ -102,6 +106,8 @@ app.get("/households/:id/cost", async (req, res) => {
       gasCost: "",
       electricityCost: "",
       elecConsumption: [],
+      manufacturers: manufacturers,
+      manufacturerId: "166"
     });
   }
 
@@ -144,7 +150,7 @@ app.get("/households/:id/cost", async (req, res) => {
       elecConsumption = await heatPumpCost(
         energyData.data.map((d: any) => d[1]),
         Array.from(weatherDataHourly!),
-        749,
+        Number(manufacturerId)!,
       );
       for (let i = 0; i < elecConsumption.length; i++) {
         electricityCost +=
@@ -165,6 +171,8 @@ app.get("/households/:id/cost", async (req, res) => {
       gasCost: gasCost.toFixed(2),
       electricityCost: electricityCost.toFixed(2),
       elecConsumption,
+      manufacturers: manufacturers,
+      manufacturerId: manufacturerId
     });
   } catch (e) {
     console.error(e);
@@ -175,6 +183,7 @@ app.get("/households/:id/cost", async (req, res) => {
       weatherDataHourly: [],
       startTime,
       endTime,
+      manufacturers: manufacturers
     });
   }
 });

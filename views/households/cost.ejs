@@ -26,6 +26,12 @@
         value="<%= endTime %>"
         required
       />
+      <label for="manufacturers">Manufacturers</label>
+      <select id="manufacturers" name="manufacturerId">
+        <% manufacturers.forEach(manufacturer => { %>
+          <option value="<%= manufacturer.id %>" <%= manufacturerId == manufacturer.id ? "selected" : "" %>><%= manufacturer.name %></option>
+        <% }); %>
+      </select>
 
       <button type="submit">Get Data</button>
     </form>

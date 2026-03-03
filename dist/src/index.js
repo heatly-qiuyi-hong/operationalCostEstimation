@@ -8,6 +8,7 @@ import Household from "../models/households.js";
 import smartMeterData from "./smartMeterData.js";
 import hourlyWeatherData from "./weather.js";
 import heatPumpCost from "./heatPump.js";
+import getManufacturers from "./manufacturers.js";
 mongoose
     .connect("mongodb://127.0.0.1:27017/operationalCostEstimation")
     .then(() => {
@@ -34,6 +35,7 @@ const electricityTariff = {
     standingCharge: 0.527,
     unitRate: 0.234,
 };
+const manufacturers = await getManufacturers();
 app.get("/households", async (req, res) => {
     const households = await Household.find({});
     // res.send(households);
@@ -69,7 +71,7 @@ app.put("/households/:id", async (req, res) => {
 });
 app.get("/households/:id/cost", async (req, res) => {
     const { id } = req.params;
-    const { startTime, endTime } = req.query;
+    const { startTime, endTime, manufacturerId } = req.query;
     const household = await Household.findById(id);
     // If user opens the page without query params, don't call APIs.
     if (!startTime || !endTime) {
@@ -83,6 +85,8 @@ app.get("/households/:id/cost", async (req, res) => {
             gasCost: "",
             electricityCost: "",
             elecConsumption: [],
+            manufacturers: manufacturers,
+            manufacturerId: "166"
         });
     }
     try {
@@ -108,7 +112,7 @@ app.get("/households/:id/cost", async (req, res) => {
                             electricityTariff.standingCharge;
                 }
             }
-            elecConsumption = await heatPumpCost(energyData.data.map((d) => d[1]), Array.from(weatherDataHourly), 749);
+            elecConsumption = await heatPumpCost(energyData.data.map((d) => d[1]), Array.from(weatherDataHourly), Number(manufacturerId));
             for (let i = 0; i < elecConsumption.length; i++) {
                 electricityCost +=
                     elecConsumption[i] * electricityTariff.unitRate +
@@ -128,6 +132,8 @@ app.get("/households/:id/cost", async (req, res) => {
             gasCost: gasCost.toFixed(2),
             electricityCost: electricityCost.toFixed(2),
             elecConsumption,
+            manufacturers: manufacturers,
+            manufacturerId: manufacturerId
         });
     }
     catch (e) {
@@ -139,6 +145,7 @@ app.get("/households/:id/cost", async (req, res) => {
             weatherDataHourly: [],
             startTime,
             endTime,
+            manufacturers: manufacturers
         });
     }
 });
