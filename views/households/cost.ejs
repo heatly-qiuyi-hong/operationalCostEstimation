@@ -28,9 +28,16 @@
       />
       <label for="manufacturers">Manufacturers</label>
       <select id="manufacturers" name="manufacturerId">
-        <% manufacturers.forEach(manufacturer => { %>
-          <option value="<%= manufacturer.id %>" <%= manufacturerId == manufacturer.id ? "selected" : "" %>><%= manufacturer.name %></option>
-        <% }); %>
+        <option value="" selected="selected">
+          Please select a manufacturer
+        </option>
+      </select>
+
+      <label for="HPModels">HP Models</label>
+      <select id="HPModels" name="HPModelId">
+        <option value="" selected="selected">
+          Please select a heat pump model
+        </option>
       </select>
 
       <button type="submit">Get Data</button>
@@ -50,5 +57,12 @@
     <pre><%= JSON.stringify(elecConsumption, null, 2) %></pre>
 
     <a href="/households/<%= household._id %>">Cancel</a>
+
+    <script>
+        const subjectObject = {};
+        for (manufacturer of manufacturers) {
+                subjectObject[manufacturer.name] = HPModels;
+        }
+    </script>
   </body>
 </html>

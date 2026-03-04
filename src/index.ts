@@ -9,9 +9,10 @@ import Household from "../models/households.js";
 
 import smartMeterData from "./smartMeterData.js";
 import hourlyWeatherData from "./weather.js";
-import heatPumpCost from "./heatPump.js";
+import { heatPumpConsumption, HPConsumption } from "./heatPump.js";
 import getManufacturers from "./manufacturers.js";
 import { start } from "repl";
+import getHPModels from "./HPModels.js";
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/operationalCostEstimation")
@@ -86,16 +87,19 @@ app.put("/households/:id", async (req, res) => {
 
 app.get("/households/:id/cost", async (req, res) => {
   const { id } = req.params;
-  const { startTime, endTime, manufacturerId } = req.query as {
+  const { startTime, endTime, manufacturerId, HPModelId } = req.query as {
     startTime?: string;
     endTime?: string;
     manufacturerId?: string;
+    HPModelId?: string;
   };
+
+  const HPModels = await getHPModels(Number(manufacturerId));
 
   const household = await Household.findById(id);
 
   // If user opens the page without query params, don't call APIs.
-  if (!startTime || !endTime) {
+  if (!startTime || !endTime || !manufacturerId || !HPModelId) {
     return res.render("../views/households/cost.ejs", {
       household,
       energyData: { data: [] },
@@ -107,7 +111,9 @@ app.get("/households/:id/cost", async (req, res) => {
       electricityCost: "",
       elecConsumption: [],
       manufacturers: manufacturers,
-      manufacturerId: "166"
+      manufacturerId: "166",
+      HPModels: HPModels,
+      HPModelId: "1",
     });
   }
 
@@ -147,11 +153,12 @@ app.get("/households/:id/cost", async (req, res) => {
         }
       }
 
-      elecConsumption = await heatPumpCost(
-        energyData.data.map((d: any) => d[1]),
-        Array.from(weatherDataHourly!),
-        Number(manufacturerId)!,
-      );
+      elecConsumption =
+        (await HPConsumption(
+          energyData.data.map((d: any) => d[1]),
+          Array.from(weatherDataHourly!),
+          Number(HPModelId)!,
+        )) || [];
       for (let i = 0; i < elecConsumption.length; i++) {
         electricityCost +=
           elecConsumption[i] * electricityTariff.unitRate +
@@ -170,9 +177,11 @@ app.get("/households/:id/cost", async (req, res) => {
       endTime,
       gasCost: gasCost.toFixed(2),
       electricityCost: electricityCost.toFixed(2),
-      elecConsumption,
+      elecConsumption: elecConsumption,
       manufacturers: manufacturers,
-      manufacturerId: manufacturerId
+      manufacturerId: manufacturerId,
+      HPModels: HPModels,
+      HPModelId: HPModelId,
     });
   } catch (e) {
     console.error(e);
@@ -183,7 +192,10 @@ app.get("/households/:id/cost", async (req, res) => {
       weatherDataHourly: [],
       startTime,
       endTime,
-      manufacturers: manufacturers
+      manufacturers: manufacturers,
+      manufacturerId: manufacturerId,
+      HPModels: HPModels,
+      HPModelId: HPModelId,
     });
   }
 });
